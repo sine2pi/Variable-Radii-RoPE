@@ -1,4 +1,4 @@
-tldr: The idea is to model relative distances between tokens and/or features.
+tldr: The idea is to model relative distances between tokens and/or features along with the relative positions using standard RoPE.
 
 # Variable Radius in RoPE (Rotary Position Embeddings)
 
