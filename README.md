@@ -18,7 +18,7 @@ Standard RoPE rotates embeddings along a 2d 1-unit circle on a plane. This varia
 - Rotation (angle) for encoding relative positions
 - Scaling (radius) for encoding positional importance
 
-This gives the model a more expressive way to represent "this token is X positions away and this positional relationship has Y importance" where both X and Y are learned during training.
+This gives the model a more expressive way to represent "that token is at X position relative to that token and that positional relationship has Y importance" where both X and Y are learned during training.
 
 Hopefully this captures more of the complex temporal dependencies in audio signals.
 
