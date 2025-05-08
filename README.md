@@ -44,6 +44,65 @@ This approach gives the model more flexibility by allowing it to learn:
 
 Standard RoPE can only rotate embeddings, while this variable radius extension can both rotate AND scale them. This provides a richer way to encode positional information, potentially improving the model's ability to handle sequences of various lengths and capture position-dependent patterns.
 
+Basic working implimentation:
+
+```python
+
+# usage:
+#
+# in attention module init:
+#         self.rotary = Rotary(dims=dims, max_ctx=1500, learned_freq=True,  variable_radius=True)
+# in forward:
+#        self.freq = self.rotary(ctx)
+#        q = self.rotary.apply_rotary(q, self.freq)
+#        k = self.rotary.apply_rotary(k, self.freq)
+
+class Rotary(nn.Module):
+    def __init__(self, dims, max_ctx=1500, learned_freq=True, variable_radius=True, learned_radius=True):
+        super().__init__()
+        self.dims = dims
+        self.variable_radius = variable_radius
+        
+        self.inv_freq = nn.Parameter(
+            1.0 / (10000 ** (torch.arange(0, dims, 2) / dims)),
+            requires_grad=learned_freq
+        )
+        
+        if variable_radius:
+            self.radius = nn.Parameter(
+                torch.ones(dims // 2),
+                requires_grad=learned_radius
+            )
+        
+        self.bias = nn.Parameter(torch.zeros(max_ctx, dims // 2))
+        
+    def forward(self, positions):
+        if isinstance(positions, int):
+            t = torch.arange(positions, device=self.inv_freq.device).float()
+        else:
+            t = positions.float().to(self.inv_freq.device)
+            
+        freqs = torch.einsum('i,j->ij', t, self.inv_freq)
+        freqs = freqs + self.bias[:freqs.shape[0]]
+        
+        if self.variable_radius:
+            radius = F.softplus(self.radius)
+            freqs = torch.polar(radius.unsqueeze(0).expand_as(freqs), freqs)
+        else:
+            freqs = torch.polar(torch.ones_like(freqs), freqs)
+            
+        return freqs
+    
+    @staticmethod
+    def apply_rotary(x, freqs):
+        x1 = x[..., :freqs.shape[-1]*2]
+        x2 = x[..., freqs.shape[-1]*2:]
+        x1 = x1.float().reshape(*x1.shape[:-1], -1, 2).contiguous() 
+        x1 = torch.view_as_complex(x1)
+        x1 = x1 * freqs
+        x1 = torch.view_as_real(x1).flatten(-2)
+        return torch.cat([x1.type_as(x), x2], dim=-1)
+```
 
 1. **Unified Interface**: Combines frequency band support and variable radius in one class
 2. **SNR-Aware Radius Adjustment**: For audio processing, includes SNR-based scaling of radius (when provided)
