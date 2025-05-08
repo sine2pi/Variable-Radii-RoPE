@@ -6,7 +6,7 @@ Hopefully this captures more of the complex temporal dependencies in audio signa
 
 Standard RoPE rotates embeddings along a 2d 1-unit circle on a plane. This variable radius extension is an attempt at adding scale. This might provide a richer way to encode positional information, potentially improving the model's ability to handle sequences of various lengths and capture position-dependent patterns. Probably good for sound. Thats the intuition anyway.
 
-
+Next step is adding real audio frequency information to the nmess.. mockup is in the same folder.
 
 ### Particularly Good for Speech?
 
