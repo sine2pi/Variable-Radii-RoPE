@@ -57,6 +57,7 @@ Basic working implimentation:
 #        q = self.rotary.apply_rotary(q, self.freq)
 #        k = self.rotary.apply_rotary(k, self.freq)
 
+
 class Rotary(nn.Module):
     def __init__(self, dims, max_ctx=1500, learned_freq=True, variable_radius=True, learned_radius=True):
         super().__init__()
@@ -93,15 +94,45 @@ class Rotary(nn.Module):
             
         return freqs
     
+    def _reshape_for_multihead(self, freqs, head, head_dim):
+        ctx = freqs.shape[0]
+        complex_per_head = head_dim // 2
+        if complex_per_head * head > freqs.shape[1]:
+            freqs = freqs[:, :complex_per_head * head]
+        elif complex_per_head * head < freqs.shape[1]:
+            padding = torch.zeros(
+                (ctx, complex_per_head * head - freqs.shape[1]), 
+                device=freqs.device, 
+                dtype=freqs.dtype
+            )
+            freqs = torch.cat([freqs, padding], dim=1)
+        freqs = freqs.view(ctx, head, complex_per_head)
+        return freqs.permute(2, 1, 0, 2).unsqueeze(0)
+
     @staticmethod
     def apply_rotary(x, freqs):
-        x1 = x[..., :freqs.shape[-1]*2]
-        x2 = x[..., freqs.shape[-1]*2:]
-        x1 = x1.float().reshape(*x1.shape[:-1], -1, 2).contiguous() 
-        x1 = torch.view_as_complex(x1)
-        x1 = x1 * freqs
-        x1 = torch.view_as_real(x1).flatten(-2)
-        return torch.cat([x1.type_as(x), x2], dim=-1)
+        multihead_format = len(freqs.shape) == 4
+        
+        if multihead_format:
+            x1 = x[..., :freqs.shape[-1]*2]
+            x2 = x[..., freqs.shape[-1]*2:]
+            
+            x1 = x1.float().reshape(*x1.shape[:-1], -1, 2).contiguous()
+            x1 = torch.view_as_complex(x1)
+            
+            x1 = x1 * freqs
+            
+            x1 = torch.view_as_real(x1).flatten(-2)
+            return torch.cat([x1.type_as(x), x2], dim=-1)
+        else:
+            x1 = x[..., :freqs.shape[-1]*2]
+            x2 = x[..., freqs.shape[-1]*2:]
+            x1 = x1.float().reshape(*x1.shape[:-1], -1, 2).contiguous() 
+            x1 = torch.view_as_complex(x1)
+            x1 = x1 * freqs
+            x1 = torch.view_as_real(x1).flatten(-2)
+            return torch.cat([x1.type_as(x), x2], dim=-1)
+
 ```
 
 1. **Unified Interface**: Combines frequency band support and variable radius in one class
