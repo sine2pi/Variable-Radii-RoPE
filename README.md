@@ -65,7 +65,7 @@ Basic working implimentation:
 
 ```python
     # # In an attention module:
-    # rotary = RotaryOptimized(dims=head_dim)
+    # rotary = Rotary(dims=head_dim)
     # q, k = rotary.rotate_queries_and_keys(q, k)
 
     # # Or directly at tensor level, without specifying context:
