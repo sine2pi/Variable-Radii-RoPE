@@ -4,6 +4,8 @@
 
 The `variable_radius` flag in this Rotary implementation adds a learnable magnitude to the complex numbers used in RoPE. This is a significant extension to the standard RoPE approach, which traditionally uses only unit-radius complex numbers (magnitude = 1).
 
+This is an attempt at making rope more interesting and useful for asr encoders or any data that might benefit from any radius other than 1.
+
 ## How it works:
 
 1. **Parameter Creation:**
