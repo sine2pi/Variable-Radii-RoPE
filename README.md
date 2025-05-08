@@ -45,7 +45,7 @@ This approach gives the model more flexibility by allowing it to learn:
 - Which to diminish (smaller radius)
 - Different scaling for different dimensions
 
-Standard RoPE can only rotate embeddings, while this variable radius extension can both rotate AND scale them. This provides a richer way to encode positional information, potentially improving the model's ability to handle sequences of various lengths and capture position-dependent patterns.
+Standard RoPE rotates embeddings along a 2d 1-unit circle on a plane. This variable radius extension can both rotate anf scale them. This provides a richer way to encode positional information, potentially improving the model's ability to handle sequences of various lengths and capture position-dependent patterns. Probably good for sound. Thats the intuition anyway.
 
 Basic working implimentation:
 
