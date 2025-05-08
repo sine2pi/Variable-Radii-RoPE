@@ -71,8 +71,7 @@ Basic working implimentation:
     # # Or directly at tensor level, without specifying context:
     # x = rotary.apply_rotary(x)  # Shape auto-detected
 
-class Rotary(nn.Module):
-   
+class Rotary(nn.Module):   
     def __init__( self, dims, ctx=1500, freqs_mode='lang', theta=10000, max_freq=10, learned_freq=False, variable_radius=False, learned_radius=False, use_xpos=False, xpos_scale_base=512, interpolate_factor=1.0, cache_if_possible=True, auto_detect_shape=True, debug=False ):
         super().__init__()
         self._counter = 0
@@ -340,6 +339,8 @@ class Rotary(nn.Module):
         ctx = token_emb.shape[1]
         freqs = self.forward(ctx)
         return self.apply_rotary(token_emb, freqs, scale=scale)
+    
+
     
 
 ```
