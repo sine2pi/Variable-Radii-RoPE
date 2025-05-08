@@ -4,7 +4,6 @@ class Rotary(nn.Module):
         super().__init__()
         self.dims = dims
         self.variable_radius = variable_radius
-        
         self.inv_freq = nn.Parameter(
             1.0 / (10000 ** (torch.arange(0, dims, 2) / dims)),
             requires_grad=learned_freq
@@ -23,16 +22,13 @@ class Rotary(nn.Module):
             t = torch.arange(positions, device=self.inv_freq.device).float()
         else:
             t = positions.float().to(self.inv_freq.device)
-            
         freqs = torch.einsum('i,j->ij', t, self.inv_freq)
         freqs = freqs + self.bias[:freqs.shape[0]]
-        
         if self.variable_radius:
             radius = F.softplus(self.radius)
             freqs = torch.polar(radius.unsqueeze(0).expand_as(freqs), freqs)
         else:
             freqs = torch.polar(torch.ones_like(freqs), freqs)
-            
         return freqs
     
     def _reshape_for_multihead(self, freqs, head, head_dim):
@@ -57,12 +53,9 @@ class Rotary(nn.Module):
         if multihead_format:
             x1 = x[..., :freqs.shape[-1]*2]
             x2 = x[..., freqs.shape[-1]*2:]
-            
             x1 = x1.float().reshape(*x1.shape[:-1], -1, 2).contiguous()
             x1 = torch.view_as_complex(x1)
-            
             x1 = x1 * freqs
-            
             x1 = torch.view_as_real(x1).flatten(-2)
             return torch.cat([x1.type_as(x), x2], dim=-1)
         else:
