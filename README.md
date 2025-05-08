@@ -61,14 +61,6 @@ This is an attempt at making rope more interesting and useful for asr encoders o
    - Rotation (from the phase angles)
    - Scaling (from the learned radii)
 
-## Why This Matters
-
-This approach gives the model more flexibility by allowing it to learn:
-- Which frequency components to emphasize (larger radius)
-- Which to diminish (smaller radius)
-- Different scaling for different dimensions
-
-
 Basic working implimentation:
 
 ```python
