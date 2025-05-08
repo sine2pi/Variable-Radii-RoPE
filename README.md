@@ -1,6 +1,12 @@
 tldr: The idea is to model relative distances between tokens and/or features along with the relative positions using standard RoPE.
 
+This gives the model a more expressive way to represent "This token is at X position relative to that token and that positional relationship has Y importance" where both X and Y are learned during training.
+
+Hopefully this captures more of the complex temporal dependencies in audio signals.
+
 Standard RoPE rotates embeddings along a 2d 1-unit circle on a plane. This variable radius extension is an attempt at adding scale. This might provide a richer way to encode positional information, potentially improving the model's ability to handle sequences of various lengths and capture position-dependent patterns. Probably good for sound. Thats the intuition anyway.
+
+
 
 ### Particularly Good for Speech?
 
@@ -17,10 +23,6 @@ Standard RoPE rotates embeddings along a 2d 1-unit circle on a plane. This varia
 
 - Rotation (angle) for encoding relative positions
 - Scaling (radius) for encoding positional importance
-
-This gives the model a more expressive way to represent "that token is at X position relative to that token and that positional relationship has Y importance" where both X and Y are learned during training.
-
-Hopefully this captures more of the complex temporal dependencies in audio signals.
 
 
 The `variable_radius` flag in this Rotary implementation adds a learnable magnitude to the complex numbers used in RoPE. This is a significant extension to the standard RoPE approach, which traditionally uses only unit-radius complex numbers (magnitude = 1).
