@@ -1,6 +1,6 @@
 tldr: The idea is to model relative distances between tokens and/or features along with the relative positions using standard RoPE.
 
-Standard RoPE rotates embeddings along a 2d 1-unit circle on a plane. This variable radius extension can both rotate anf scale them. This might provide a richer way to encode positional information, potentially improving the model's ability to handle sequences of various lengths and capture position-dependent patterns. Probably good for sound. Thats the intuition anyway.
+Standard RoPE rotates embeddings along a 2d 1-unit circle on a plane. This variable radius extension is an attempt at adding scale. This might provide a richer way to encode positional information, potentially improving the model's ability to handle sequences of various lengths and capture position-dependent patterns. Probably good for sound. Thats the intuition anyway.
 
 ### Particularly Good for Speech?
 
