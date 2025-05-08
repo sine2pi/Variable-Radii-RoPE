@@ -61,6 +61,101 @@ This is an attempt at making rope more interesting and useful for asr encoders o
    - Rotation (from the phase angles)
    - Scaling (from the learned radii)
 
+
+
+# Rotary Embedding Configuration Options
+
+There are a few configuration parameters that control different aspects of the rotary embeddings. Here's a comprehensive breakdown:
+
+## Core Parameters
+
+- `dims`: Embedding dimension (typically head_dim in attention)
+- `ctx=1500`: Maximum context length
+- `debug=False`: Whether to print debug information
+
+## Advanced Embedding Control
+
+- `variable_radius=False`: Use variable radius for complex numbers
+- `learned_radius=False`: Make radius values trainable parameters
+- `use_xpos=False`: Use xPos extension (position-dependent scaling)
+- `xpos_scale_base=512`: Base for xPos scaling formula
+- `interpolate_factor=1.0`: Scale positions for longer effective context
+
+## Performance Options
+
+- `cache_if_possible=True`: Cache computed frequencies for reuse
+- `auto_detect_shape=True`: Automatically detect tensor shapes/formats
+
+## Automatic Detection
+
+Yes, when `auto_detect_shape=True` (the default), the implementation automatically:
+
+1. Analyzes input tensor shapes to determine if it's:
+   - Standard sequence format `[batch, seq_len, dim]`
+   - Multi-head format `[batch, heads, seq_len, head_dim]`
+
+2. Adapts the rotary calculations based on the detected format
+
+3. Applies appropriate reshape operations for the tensor type
+
+## Frequency Configuration
+
+- `freqs_mode='lang'`: Mode for frequency generation
+  - Options: `'lang'` (language), `'pixel'` (vision), `'constant'` (boring)
+- `theta=10000`: Base for frequency computation in language mode
+- `max_freq=10`: Maximum frequency when using pixel mode
+- `learned_freq=False`: Whether frequencies are trainable
+
+This rotary class works across different components (encoder layers, decoder layers, attention modules) without needing specific format adjustments.
+
+## Integration Methods
+
+The class provides several convenience methods:
+
+In an attention module:
+
+    rotary = Rotary(dims=head_dim)
+    q, k = rotary.rotate_queries_and_keys(q, k)
+
+ Directly at tensor level, without specifying context:
+ 
+    x = rotary.apply_rotary(x) # Apply to any tensor (auto-detects format)
+
+ Specialized for attention
+ 
+    q, k = rotary.rotate_queries_and_keys(q, k)
+
+ Full monty QKV handling
+ 
+    q, k, v = rotary.rotate_qkv(q, k, v)
+
+ For token embeddings
+ 
+    embeddings = rotary.rotate_token_embeddings(embeddings)
+
+ Or with a specific context length:
+ 
+    x = rotary.apply_rotary(x, ctx=ctx)  # Shape auto-detected
+
+```python
+# Apply to any tensor (auto-detects format)
+x = rotary.apply_rotary(x)
+
+# Specialized for attention
+q, k = rotary.rotate_queries_and_keys(q, k)
+
+# Full QKV handling
+q, k, v = rotary.rotate_qkv(q, k, v)
+
+# For token embeddings
+embeddings = rotary.rotate_token_embeddings(embeddings)
+```
+
+Each method handles the shape detection and appropriate transformations internally, making the implementation very flexible.
+
+
+
+
 Basic working implimentation:
 
 ```python
