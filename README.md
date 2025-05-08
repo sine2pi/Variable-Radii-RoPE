@@ -68,7 +68,7 @@ Basic working implimentation:
 # usage:
 #
 # in attention module init:
-#         self.rotary = Rotary(dims=dims, max_ctx=1500, learned_freq=True,  variable_radius=True)
+#         self.rotary = Rotary(dims=dims, learned_freq=True, variable_radius=True, learned_radius=True) 
 # in forward:
 #        self.freq = self.rotary(ctx)
 #        q = self.rotary.apply_rotary(q, self.freq)
