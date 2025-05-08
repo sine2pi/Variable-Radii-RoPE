@@ -1,9 +1,27 @@
 tldr: The idea is to model relative distances between tokens and/or features along with the relative positions using standard RoPE.
 
-Standard RoPE rotates embeddings along a 2d 1-unit circle on a plane. This variable radius extension can both rotate anf scale them. This provides a richer way to encode positional information, potentially improving the model's ability to handle sequences of various lengths and capture position-dependent patterns. Probably good for sound. Thats the intuition anyway.
+Standard RoPE rotates embeddings along a 2d 1-unit circle on a plane. This variable radius extension can both rotate anf scale them. This might provide a richer way to encode positional information, potentially improving the model's ability to handle sequences of various lengths and capture position-dependent patterns. Probably good for sound. Thats the intuition anyway.
 
+### Particularly Good for Speech?
 
-# Variable Radius in RoPE (Rotary Position Embeddings)
+1. **Time-scale invariance**: Speech has natural elasticity (people speak at different speeds) - variable radius allows the model to learn which temporal distances matter most regardless of absolute speed
+
+2. **Frequency-selective attention**: Some frequency components of speech carry more information than others (like formant transitions) - learned radii can emphasize the most relevant positional frequencies
+
+3. **Context-dependent relationships**: In speech, the importance of a relationship between positions varies:
+   - Phoneme boundaries need strong positional signals
+   - Steady vowel states need less precise positioning
+   - Silence regions need minimal positional emphasis
+
+4. **Distance-dependent weighting**: This allows the model to learn how much "distance matters" for different frequency components, which is crucial as some speech patterns are local while others span longer contexts
+
+- Rotation (angle) for encoding relative positions
+- Scaling (radius) for encoding positional importance
+
+This effectively giving a model a more expressive way to represent "this token is X positions away and this positional relationship has Y importance" where both X and Y are learned during training.
+
+Hopefully this captures more of the complex temporal dependencies in audio signals.
+
 
 The `variable_radius` flag in this Rotary implementation adds a learnable magnitude to the complex numbers used in RoPE. This is a significant extension to the standard RoPE approach, which traditionally uses only unit-radius complex numbers (magnitude = 1).
 
