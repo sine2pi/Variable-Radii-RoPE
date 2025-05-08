@@ -63,17 +63,17 @@ This is an attempt at making rope more interesting and useful for asr encoders o
 
 
 
-# Rotary Embedding Configuration Options
+##### Rotary Embedding Configuration Options
 
 There are a few configuration parameters that control different aspects of the rotary embeddings. Here's a comprehensive breakdown:
 
-## Core Parameters
+#### Core Parameters
 
 - `dims`: Embedding dimension (typically head_dim in attention)
 - `ctx=1500`: Maximum context length
 - `debug=False`: Whether to print debug information
 
-## Advanced Embedding Control
+#### Advanced Embedding Control
 
 - `variable_radius=False`: Use variable radius for complex numbers
 - `learned_radius=False`: Make radius values trainable parameters
@@ -81,12 +81,12 @@ There are a few configuration parameters that control different aspects of the r
 - `xpos_scale_base=512`: Base for xPos scaling formula
 - `interpolate_factor=1.0`: Scale positions for longer effective context
 
-## Performance Options
+#### Performance Options
 
 - `cache_if_possible=True`: Cache computed frequencies for reuse
 - `auto_detect_shape=True`: Automatically detect tensor shapes/formats
 
-## Automatic Detection
+#### Automatic Detection
 
 Yes, when `auto_detect_shape=True` (the default), the implementation automatically:
 
@@ -98,7 +98,7 @@ Yes, when `auto_detect_shape=True` (the default), the implementation automatical
 
 3. Applies appropriate reshape operations for the tensor type
 
-## Frequency Configuration
+#### Frequency Configuration
 
 - `freqs_mode='lang'`: Mode for frequency generation
   - Options: `'lang'` (language), `'pixel'` (vision), `'constant'` (boring)
@@ -106,37 +106,37 @@ Yes, when `auto_detect_shape=True` (the default), the implementation automatical
 - `max_freq=10`: Maximum frequency when using pixel mode
 - `learned_freq=False`: Whether frequencies are trainable
 
-This rotary class works across different components (encoder layers, decoder layers, attention modules) without needing specific format adjustments.
+#### This rotary class works across different components (encoder layers, decoder layers, attention modules) without needing specific format adjustments.
 
-## Integration Methods
+#### Integration Methods
 
 The class provides several convenience methods:
 
 In an attention module:
-
+```
     rotary = Rotary(dims=head_dim)
     q, k = rotary.rotate_queries_and_keys(q, k)
-
+```
  Directly at tensor level, without specifying context:
- 
+ ```
     x = rotary.apply_rotary(x) # Apply to any tensor (auto-detects format)
-
+```
  Specialized for attention
- 
+ ```
     q, k = rotary.rotate_queries_and_keys(q, k)
-
+```
  Full monty QKV handling
- 
+ ```
     q, k, v = rotary.rotate_qkv(q, k, v)
-
+```
  For token embeddings
- 
+ ```
     embeddings = rotary.rotate_token_embeddings(embeddings)
-
+```
  Or with a specific context length:
- 
+ ```
     x = rotary.apply_rotary(x, ctx=ctx)  # Shape auto-detected
-
+```
 ```python
 # Apply to any tensor (auto-detects format)
 x = rotary.apply_rotary(x)
