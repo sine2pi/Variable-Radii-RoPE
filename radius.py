@@ -1,9 +1,22 @@
-    # # In an attention module:
+    # In an attention module:
     # rotary = Rotary(dims=head_dim)
     # q, k = rotary.rotate_queries_and_keys(q, k)
 
     # # Or directly at tensor level, without specifying context:
-    # x = rotary.apply_rotary(x)  # Shape auto-detected
+    # # Apply to any tensor (auto-detects format)
+    # x = rotary.apply_rotary(x)
+
+    # # Specialized for attention
+    # q, k = rotary.rotate_queries_and_keys(q, k)
+
+    # # Full QKV handling
+    # q, k, v = rotary.rotate_qkv(q, k, v)
+
+    # # For token embeddings
+    # embeddings = rotary.rotate_token_embeddings(embeddings)
+
+    # # Or with a specific context length:
+    # x = rotary.apply_rotary(x, ctx=ctx)  # Shape auto-detected
 
 
 class Rotary(nn.Module):   
