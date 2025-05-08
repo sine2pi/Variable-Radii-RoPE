@@ -113,58 +113,36 @@ Yes, when `auto_detect_shape=True` (the default), the implementation automatical
 The class provides several convenience methods:
 
 In an attention module:
-```
+   ```python
     rotary = Rotary(dims=head_dim)
     q, k = rotary.rotate_queries_and_keys(q, k)
 ```
  Directly at tensor level, without specifying context:
- ```
+   ```python
     x = rotary.apply_rotary(x) # Apply to any tensor (auto-detects format)
 ```
  Specialized for attention
- ```
+   ```python
     q, k = rotary.rotate_queries_and_keys(q, k)
 ```
  Full monty QKV handling
- ```
+   ```python
     q, k, v = rotary.rotate_qkv(q, k, v)
 ```
  For token embeddings
- ```
+   ```python
     embeddings = rotary.rotate_token_embeddings(embeddings)
 ```
  Or with a specific context length:
- ```
+   ```python
     x = rotary.apply_rotary(x, ctx=ctx)  # Shape auto-detected
-```
-```python
-# Apply to any tensor (auto-detects format)
-x = rotary.apply_rotary(x)
-
-# Specialized for attention
-q, k = rotary.rotate_queries_and_keys(q, k)
-
-# Full QKV handling
-q, k, v = rotary.rotate_qkv(q, k, v)
-
-# For token embeddings
-embeddings = rotary.rotate_token_embeddings(embeddings)
 ```
 
 Each method handles the shape detection and appropriate transformations internally, making the implementation very flexible.
 
-
-
-
 Basic working implimentation:
 
 ```python
-    # # In an attention module:
-    # rotary = Rotary(dims=head_dim)
-    # q, k = rotary.rotate_queries_and_keys(q, k)
-
-    # # Or directly at tensor level, without specifying context:
-    # x = rotary.apply_rotary(x)  # Shape auto-detected
 
 class Rotary(nn.Module):   
     def __init__( self, dims, ctx=1500, freqs_mode='lang', theta=10000, max_freq=10, learned_freq=False, variable_radius=False, learned_radius=False, use_xpos=False, xpos_scale_base=512, interpolate_factor=1.0, cache_if_possible=True, auto_detect_shape=True, debug=False ):
