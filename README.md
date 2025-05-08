@@ -82,6 +82,7 @@ Basic working implimentation:
 #        q = self.rotary.apply_rotary(q, self.freq)
 #        k = self.rotary.apply_rotary(k, self.freq)
 
+# use the same way in your encoder or decoder.
 
 class Rotary(nn.Module):
     def __init__(self, dims, max_ctx=1500, learned_freq=True, variable_radius=True, learned_radius=True):
